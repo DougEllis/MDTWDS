@@ -1,0 +1,71 @@
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# Create Form
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Deployment Status"
+$form.Size = New-Object System.Drawing.Size(600, 220)
+$form.StartPosition = "CenterScreen"
+$form.BackColor = 'White'
+$form.TopMost = $true
+
+# Load Logo (Update path as needed)
+$logo = New-Object System.Windows.Forms.PictureBox
+$logo.ImageLocation = "X:\Deploy\Scripts\logo.png"  # Make sure this exists in WinPE!
+$logo.SizeMode = "StretchImage"
+$logo.Size = New-Object System.Drawing.Size(100, 100)
+$logo.Location = New-Object System.Drawing.Point(20, 30)
+$form.Controls.Add($logo)
+
+# Status Label
+$labelStatus = New-Object System.Windows.Forms.Label
+$labelStatus.Text = "Initializing Deployment..."
+$labelStatus.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
+$labelStatus.AutoSize = $true
+$labelStatus.Location = New-Object System.Drawing.Point(140, 40)
+$form.Controls.Add($labelStatus)
+
+# Task Sequence Info
+try {
+    $tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment
+    $tsID = $tsenv.Value("TaskSequenceID")
+    $pcName = $tsenv.Value("OSDComputerName")
+
+    $labelInfo = New-Object System.Windows.Forms.Label
+    $labelInfo.Text = "TS ID: $tsID | Computer Name: $pcName"
+    $labelInfo.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+    $labelInfo.AutoSize = $true
+    $labelInfo.Location = New-Object System.Drawing.Point(140, 70)
+    $form.Controls.Add($labelInfo)
+} catch {
+    # Handle missing COM support in some PE setups
+}
+
+# Progress Bar
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Location = New-Object System.Drawing.Point(140, 100)
+$progressBar.Size = New-Object System.Drawing.Size(400, 20)
+$progressBar.Style = 'Continuous'
+$progressBar.Value = 10  # Update this dynamically later
+$form.Controls.Add($progressBar)
+
+$form.Show()
+
+# Example status updates (optional, for testing)
+Start-Sleep -Seconds 3
+$labelStatus.Text = "Applying Operating System..."
+$progressBar.Value = 40
+$form.Refresh()
+
+Start-Sleep -Seconds 3
+$labelStatus.Text = "Installing Applications..."
+$progressBar.Value = 70
+$form.Refresh()
+
+Start-Sleep -Seconds 3
+$labelStatus.Text = "Finalizing Deployment..."
+$progressBar.Value = 100
+$form.Refresh()
+
+# Keep the form open
+$form.ShowDialog()
