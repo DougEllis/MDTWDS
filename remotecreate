@@ -1,0 +1,52 @@
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# === Create Form ===
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "TeamViewer Info"
+$form.Size = New-Object System.Drawing.Size(400, 250)
+$form.StartPosition = "CenterScreen"
+
+# === Label ===
+$label = New-Object System.Windows.Forms.Label
+$label.Text = "TeamViewer ID: $tvID`nTeamViewer Password: $tvPassword"
+$label.Size = New-Object System.Drawing.Size(360, 60)
+$label.Location = New-Object System.Drawing.Point(20, 20)
+$form.Controls.Add($label)
+
+# === Copy to Clipboard Button ===
+$copyButton = New-Object System.Windows.Forms.Button
+$copyButton.Text = "Copy to Clipboard"
+$copyButton.Size = New-Object System.Drawing.Size(150, 30)
+$copyButton.Location = New-Object System.Drawing.Point(20, 100)
+$copyButton.Add_Click({
+    $text = "TeamViewer ID: $tvID`nTeamViewer Password: $tvPassword"
+    [System.Windows.Forms.Clipboard]::SetText($text)
+    [System.Windows.Forms.MessageBox]::Show("Copied to clipboard!", "Success")
+})
+$form.Controls.Add($copyButton)
+
+# === Save to File Button ===
+$saveButton = New-Object System.Windows.Forms.Button
+$saveButton.Text = "Save to File"
+$saveButton.Size = New-Object System.Drawing.Size(150, 30)
+$saveButton.Location = New-Object System.Drawing.Point(200, 100)
+$saveButton.Add_Click({
+    $filePath = "C:\Logs\TeamViewerInfo.txt"
+    $text = "TeamViewer ID: $tvID`nTeamViewer Password: $tvPassword"
+    Set-Content -Path $filePath -Value $text
+    [System.Windows.Forms.MessageBox]::Show("Saved to $filePath", "Success")
+})
+$form.Controls.Add($saveButton)
+
+# === Close Button ===
+$closeButton = New-Object System.Windows.Forms.Button
+$closeButton.Text = "Close"
+$closeButton.Size = New-Object System.Drawing.Size(100, 30)
+$closeButton.Location = New-Object System.Drawing.Point(150, 150)
+$closeButton.Add_Click({ $form.Close() })
+$form.Controls.Add($closeButton)
+
+# === Show Form ===
+$form.Topmost = $true
+$form.ShowDialog()
